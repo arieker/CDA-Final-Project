@@ -1,6 +1,5 @@
 #include "spimcore.h"
 
-
 /* ALU */
 /* 10 Points */
 void ALU(unsigned A,unsigned B,char ALUControl,unsigned *ALUresult,char *Zero)
@@ -19,16 +18,16 @@ void ALU(unsigned A,unsigned B,char ALUControl,unsigned *ALUresult,char *Zero)
             *ALUresult = (unsigned)A < (unsigned)B ? 1 : 0;
             break;
         case 4:
-            *ALUresult = A & B;  // Bitwise AND
+            *ALUresult = A & B;
             break;
         case 5:
-            *ALUresult = A | B;  // Bitwise OR
+            *ALUresult = A | B;
             break;
         case 6:
             *ALUresult = B << 16;
             break;
         default:
-            *ALUresult = ~A;  // Bitwise NOT
+            *ALUresult = ~A;
             break;
     }
     
@@ -70,7 +69,6 @@ void instruction_partition(unsigned instruction, unsigned *op, unsigned *r1,unsi
 /* 15 Points */
 int instruction_decode(unsigned op,struct_controls *controls)
 {
-<<<<<<< HEAD
     // Set to default values to avoid potential headache
     controls->RegDst = 2;    // don't care
     controls->Jump = 2;      // don't care
@@ -116,7 +114,7 @@ int instruction_decode(unsigned op,struct_controls *controls)
             controls->ALUSrc = 1;
             break;
         //case 0xFFFFFFFF: // Halt condition (replace with the actual value)
-            //return 1;
+            //return 1; COMMENTED OUT FOR NOW, I DONT KNOW HOW TO DO THE HALT CASE YET :)
         default:
             // Handle unrecognized opcode
             break;
@@ -124,9 +122,6 @@ int instruction_decode(unsigned op,struct_controls *controls)
 
     // No halt condition occurred
     return 0;
-=======
-    
->>>>>>> 2nd
 }
 
 /* Read Register */
