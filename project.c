@@ -39,7 +39,17 @@ void ALU(unsigned A,unsigned B,char ALUControl,unsigned *ALUresult,char *Zero)
 /* 10 Points */
 int instruction_fetch(unsigned PC,unsigned *Mem,unsigned *instruction)
 {
+    // halt condidition for non word-alligned address
+    if (PC % 4 != 0)
+        return 1;
+
     *instruction = Mem[PC >> 2];
+    
+
+    //halt condition for illegal instruction 
+    if (*instruction == 0)
+        return 1;
+
     return 0;
 }
 
