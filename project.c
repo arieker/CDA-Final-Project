@@ -4,6 +4,7 @@
 /* 10 Points */
 void ALU(unsigned A,unsigned B,char ALUControl,unsigned *ALUresult,char *Zero)
 {
+    // ! Halt conditions still need to be accounted for here
     switch (ALUControl) {
         case 0: *ALUresult = A + B; break;
         case 1: *ALUresult = A - B; break;
@@ -99,7 +100,7 @@ int instruction_decode(unsigned op,struct_controls *controls)
             controls->RegWrite = 1;
             controls->ALUSrc = 1;
             break;
-        //case 0xFFFFFFFF: // ! Halt condition (replace with the actual value)
+        //case 0xFFFFFFFF: // ! my attempt at halt condition (replace with the actual value)
             //return 1; COMMENTED OUT FOR NOW, I DONT KNOW HOW TO DO THE HALT CASE YET :)
         default:
             // Handle unrecognized opcode
@@ -155,7 +156,7 @@ int rw_memory(unsigned ALUresult,unsigned data2,char MemWrite,char MemRead,unsig
 
     if (MemWrite == 0 && MemRead == 0)
     {
-        // neither are happening so maybe halt?
+        // Neither are happening so maybe halt?
         return 1;
     }
     else if (MemWrite == 1)
@@ -174,7 +175,7 @@ int rw_memory(unsigned ALUresult,unsigned data2,char MemWrite,char MemRead,unsig
 /* 10 Points */
 void write_register(unsigned r2,unsigned r3,unsigned memdata,unsigned ALUresult,char RegWrite,char RegDst,char MemtoReg,unsigned *Reg)
 {
-    // Instructions: e the data (ALUresult or memdata) to a register (Reg) addressed by r2 or r3
+    // Instructions: Write the data (ALUresult or memdata) to a register (Reg) addressed by r2 or r3.
 
 }
 
