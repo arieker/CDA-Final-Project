@@ -5,30 +5,14 @@
 void ALU(unsigned A,unsigned B,char ALUControl,unsigned *ALUresult,char *Zero)
 {
     switch (ALUControl) {
-        case 0:
-            *ALUresult = A + B;
-            break;
-        case 1:
-            *ALUresult = A - B;
-            break;
-        case 2:
-            *ALUresult = A < B ? 1 : 0;
-            break;
-        case 3:
-            *ALUresult = (unsigned)A < (unsigned)B ? 1 : 0;
-            break;
-        case 4:
-            *ALUresult = A & B;
-            break;
-        case 5:
-            *ALUresult = A | B;
-            break;
-        case 6:
-            *ALUresult = B << 16;
-            break;
-        default:
-            *ALUresult = ~A;
-            break;
+        case 0: *ALUresult = A + B; break;
+        case 1: *ALUresult = A - B; break;
+        case 2: *ALUresult = A < B ? 1 : 0; break;
+        case 3: *ALUresult = (unsigned)A < (unsigned)B ? 1 : 0; break;
+        case 4: *ALUresult = A & B; break;
+        case 5: *ALUresult = A | B; break;
+        case 6: *ALUresult = B << 16; break;
+        default: *ALUresult = ~A; break;
     }
     
     *Zero = (*ALUresult == 0) ? 1 : 0;
