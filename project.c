@@ -68,6 +68,9 @@ void instruction_partition(unsigned instruction, unsigned *op, unsigned *r1,unsi
 /* 15 Points */
 int instruction_decode(unsigned op,struct_controls *controls)
 {
+    // ! Halt conditions need to be set for this function, it also may not work since it's not accounting for all possible instructions
+    // ! AKA this needs work I'm not confident in it, -anthony
+
     // Set to default values to avoid potential headache
     controls->RegDst = 2;    // don't care
     controls->Jump = 2;      // don't care
@@ -112,12 +115,13 @@ int instruction_decode(unsigned op,struct_controls *controls)
             controls->RegWrite = 1;
             controls->ALUSrc = 1;
             break;
-        //case 0xFFFFFFFF: // Halt condition (replace with the actual value)
+        //case 0xFFFFFFFF: // ! Halt condition (replace with the actual value)
             //return 1; COMMENTED OUT FOR NOW, I DONT KNOW HOW TO DO THE HALT CASE YET :)
         default:
             // Handle unrecognized opcode
             break;
     }
+
     return 0;
 }
 
@@ -125,6 +129,8 @@ int instruction_decode(unsigned op,struct_controls *controls)
 /* 5 Points */
 void read_register(unsigned r1,unsigned r2,unsigned *Reg,unsigned *data1,unsigned *data2)
 {
+    // Do halt conditions need to be accounted for here?
+
     *data1 = Reg[r1];
     *data2 = Reg[r2];
 }
@@ -143,22 +149,41 @@ int ALU_operations(unsigned data1,unsigned data2,unsigned extended_value,unsigne
     unsigned operand2 = (ALUSrc == 1) ? extended_value : data2;
 
     ALU(data1, operand2, ALUOp, ALUresult, Zero);
-
-        return 0;
+    
+    return 0;
 }
 
 /* Read / Write Memory */
 /* 10 Points */
 int rw_memory(unsigned ALUresult,unsigned data2,char MemWrite,char MemRead,unsigned *memdata,unsigned *Mem)
 {
+    if (ALUresult % 4 != 0)
+    {
+        return 1;
+    }
 
+    if (MemWrite == 0 && MemRead == 0)
+    {
+        // neither are happening so maybe halt?
+        return 1;
+    }
+    else if (MemWrite == 1)
+    {
+        Mem[ALUresult] = data2;
+    }
+    else // Read
+    {
+        *memdata = Mem[ALUresult];
+    }
+    
+    return 0;
 }
-
 
 /* Write Register */
 /* 10 Points */
 void write_register(unsigned r2,unsigned r3,unsigned memdata,unsigned ALUresult,char RegWrite,char RegDst,char MemtoReg,unsigned *Reg)
 {
+    // Instructions: e the data (ALUresult or memdata) to a register (Reg) addressed by r2 or r3
 
 }
 
@@ -166,5 +191,6 @@ void write_register(unsigned r2,unsigned r3,unsigned memdata,unsigned ALUresult,
 /* 10 Points */
 void PC_update(unsigned jsec,unsigned extended_value,char Branch,char Jump,char Zero,unsigned *PC)
 {
+    // Instructions: Update the program counter (PC).
 
 }
