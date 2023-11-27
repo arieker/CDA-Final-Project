@@ -38,14 +38,13 @@ void ALU(unsigned A,unsigned B,char ALUControl,unsigned *ALUresult,char *Zero)
 /* 10 Points */
 int instruction_fetch(unsigned PC,unsigned *Mem,unsigned *instruction)
 {
-    // halt condidition for non word-alligned address
+    // Halt condidition for non word-alligned address
     if (PC % 4 != 0)
         return 1;
 
     *instruction = Mem[PC >> 2];
-    
 
-    //halt condition for illegal instruction 
+    // Halt condition for illegal instruction 
     if (*instruction == 0)
         return 1;
 
@@ -119,8 +118,6 @@ int instruction_decode(unsigned op,struct_controls *controls)
             // Handle unrecognized opcode
             break;
     }
-
-    // No halt condition occurred
     return 0;
 }
 
@@ -145,10 +142,9 @@ int ALU_operations(unsigned data1,unsigned data2,unsigned extended_value,unsigne
 {
     unsigned operand2 = (ALUSrc == 1) ? extended_value : data2;
 
-    
     ALU(data1, operand2, ALUOp, ALUresult, Zero);
 
-    return 0;
+        return 0;
 }
 
 /* Read / Write Memory */
