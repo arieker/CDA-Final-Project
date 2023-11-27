@@ -4,7 +4,6 @@
 /* 10 Points */
 void ALU(unsigned A,unsigned B,char ALUControl,unsigned *ALUresult,char *Zero)
 {
-    // ! Halt conditions still need to be accounted for here
     switch (ALUControl) {
         case 0: *ALUresult = A + B; break;
         case 1: *ALUresult = A - B; break;
@@ -131,8 +130,9 @@ void sign_extend(unsigned offset,unsigned *extended_value)
 /* 10 Points */
 int ALU_operations(unsigned data1,unsigned data2,unsigned extended_value,unsigned funct,char ALUOp,char ALUSrc,unsigned *ALUresult,char *Zero)
 {
-    unsigned operand1 = NULL;
-        switch(ALUSrc){
+    /* temp commented out for error
+    unsigned operand1 = NULL; tempcommented out
+    switch(ALUSrc){
         case 1: operand1 = extended_value; break;
         case 2: operand1 = data1; break;
         default: operand1 = data2; break;
@@ -143,6 +143,7 @@ int ALU_operations(unsigned data1,unsigned data2,unsigned extended_value,unsigne
     ALU(data1, data2, operand1, ALUresult, Zero);
 
     return 0;
+    */ 
 }
 
 /* Read / Write Memory */
