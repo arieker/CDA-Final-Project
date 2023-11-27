@@ -95,7 +95,13 @@ void sign_extend(unsigned offset,unsigned *extended_value)
 /* 10 Points */
 int ALU_operations(unsigned data1,unsigned data2,unsigned extended_value,unsigned funct,char ALUOp,char ALUSrc,unsigned *ALUresult,char *Zero)
 {
+    // Decide the operands to use
+    unsigned operand2 = (ALUSrc == 1) ? extended_value : data2;
 
+    // ALU operation
+    ALU(data1, operand2, ALUOp, ALUresult, Zero);
+
+    return 0;
 }
 
 /* Read / Write Memory */
