@@ -39,7 +39,17 @@ void ALU(unsigned A,unsigned B,char ALUControl,unsigned *ALUresult,char *Zero)
 /* 10 Points */
 int instruction_fetch(unsigned PC,unsigned *Mem,unsigned *instruction)
 {
+    // halt condidition for non word-alligned address
+    if (PC % 4 != 0)
+        return 1;
+
     *instruction = Mem[PC >> 2];
+    
+
+    //halt condition for illegal instruction 
+    if (*instruction == 0)
+        return 1;
+
     return 0;
 }
 
@@ -60,6 +70,7 @@ void instruction_partition(unsigned instruction, unsigned *op, unsigned *r1,unsi
 /* 15 Points */
 int instruction_decode(unsigned op,struct_controls *controls)
 {
+<<<<<<< HEAD
     // Set to default values to avoid potential headache
     controls->RegDst = 2;    // don't care
     controls->Jump = 2;      // don't care
@@ -113,6 +124,9 @@ int instruction_decode(unsigned op,struct_controls *controls)
 
     // No halt condition occurred
     return 0;
+=======
+    
+>>>>>>> 2nd
 }
 
 /* Read Register */
