@@ -7,12 +7,12 @@ void ALU(unsigned A,unsigned B,char ALUControl,unsigned *ALUresult,char *Zero)
     switch (ALUControl) {
         case 0: *ALUresult = A + B; break;
         case 1: *ALUresult = A - B; break;
-        case 2: *ALUresult = A < B ? 1 : 0; break;
-        case 3: *ALUresult = (unsigned)A < (unsigned)B ? 1 : 0; break;
+        case 2: *ALUresult = (int)A < (int)B ? 1 : 0; break;
+        case 3: *ALUresult = A < B ? 1 : 0; break;
         case 4: *ALUresult = A & B; break;
         case 5: *ALUresult = A | B; break;
         case 6: *ALUresult = B << 16; break;
-        default: *ALUresult = ~A; break;
+        case 7: *ALUresult = ~A; break;
     }
     
     *Zero = (*ALUresult == 0) ? 1 : 0;
@@ -22,8 +22,8 @@ void ALU(unsigned A,unsigned B,char ALUControl,unsigned *ALUresult,char *Zero)
 /* 10 Points */
 int instruction_fetch(unsigned PC,unsigned *Mem,unsigned *instruction)
 {
-    // Halt condidition for non word-alligned address
-    if (PC % 4 != 0)
+    // Halt condidition for non word-alligned address or over max memory usage
+    if (PC % 4 != 0 || PC > 65535)
         return 1;
 
     *instruction = Mem[PC >> 2];
@@ -148,7 +148,6 @@ int instruction_decode(unsigned op,struct_controls *controls)
         default:
             return 1;
     }
-    return return 1;
 }
 
 /* Read Register */
@@ -209,7 +208,7 @@ int ALU_operations(unsigned data1,unsigned data2,unsigned extended_value,unsigne
 /* 10 Points */
 int rw_memory(unsigned ALUresult,unsigned data2,char MemWrite,char MemRead,unsigned *memdata,unsigned *Mem)
 {
-    if (ALUresult % 4 != 0)
+    if (ALUresult % 4 != 0 || ALUresult > 65535)
     {
         return 1;
     }
