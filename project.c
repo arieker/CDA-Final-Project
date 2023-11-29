@@ -52,61 +52,103 @@ void instruction_partition(unsigned instruction, unsigned *op, unsigned *r1,unsi
 /* 15 Points */
 int instruction_decode(unsigned op,struct_controls *controls)
 {
-    // ! Halt conditions need to be set for this function, it also may not work since it's not accounting for all possible instructions
-    // ! AKA this needs work I'm not confident in it, -anthony
-
-    // Set to default values to avoid potential headache
-    controls->RegDst = 2;    // don't care
-    controls->Jump = 2;      // don't care
-    controls->Branch = 2;    // don't care
-    controls->MemRead = 0;   // disabled
-    controls->MemtoReg = 2;  // don't care
-    controls->ALUOp = 0;     // default value
-    controls->MemWrite = 0;  // disabled
-    controls->ALUSrc = 0;    // default value
-    controls->RegWrite = 0;  // disabled
+    // ! This is untested, I removed defaults because I don't think we need to set them?
+    // ! but we may need to, pending deletion -anthony
 
     // Decode the instruction using the opcode (op)
     switch (op) {
-        case 0b000000: // R-type instruction
+        case 0x00:
             controls->RegDst = 1;
-            controls->ALUOp = 0b111;
+            controls->Jump = 0;
+            controls->Branch = 0;
+            controls->MemRead = 0;
+            controls->MemtoReg = 0;
+            controls->ALUOp = 7;
+            controls->MemWrite = 0;
+            controls->ALUSrc = 0;
             controls->RegWrite = 1;
             break;
-        case 0b100011: // lw instruction
+        case 0x0d:
+            controls->RegDst = 0;
+            controls->Jump = 0;
+            controls->Branch = 0;
+            controls->MemRead = 0;
+            controls->MemtoReg = 0;
+            controls->ALUOp = 5;
+            controls->MemWrite = 0;
+            controls->ALUSrc = 1;
+            controls->RegWrite = 1;
+            break;
+        case 0x23:
+            controls->RegDst = 0;
+            controls->Jump = 0;
+            controls->Branch = 0;
             controls->MemRead = 1;
             controls->MemtoReg = 1;
+            controls->ALUOp = 0;
+            controls->MemWrite = 0;
             controls->ALUSrc = 1;
             controls->RegWrite = 1;
             break;
-        case 0b101011: // sw instruction
+        case 0x2b:
+            controls->RegDst = 2;
+            controls->Jump = 0;
+            controls->Branch = 0;
+            controls->MemRead = 0;
+            controls->MemtoReg = 2;
+            controls->ALUOp = 0;
             controls->MemWrite = 1;
             controls->ALUSrc = 1;
+            controls->RegWrite = 0;
             break;
-        case 0b000100: // beq instruction
-            controls->Branch = 1;
-            controls->ALUOp = 0b010;
-            break;
-        case 0b000010: // j instruction
-            controls->Jump = 1;
-            break;
-        case 0b000101: // bne instruction
-            controls->Branch = 1;
-            controls->ALUOp = 0b011;
-            break;
-        case 0b001000: // addi instruction
-            controls->ALUOp = 0;
-            controls->RegWrite = 1;
+        case 0x0a:
+            controls->RegDst = 0;
+            controls->Jump = 0;
+            controls->Branch = 0;
+            controls->MemRead = 0;
+            controls->MemtoReg = 0;
+            controls->ALUOp = 2;
+            controls->MemWrite = 0;
             controls->ALUSrc = 1;
+            controls->RegWrite = 1;
             break;
-        //case 0xFFFFFFFF: // ! my attempt at halt condition (replace with the actual value)
-            //return 1; COMMENTED OUT FOR NOW, I DONT KNOW HOW TO DO THE HALT CASE YET :)
+        case 0x04:
+            controls->RegDst = 2;
+            controls->Jump = 0;
+            controls->Branch = 1;
+            controls->MemRead = 0;
+            controls->MemtoReg = 2;
+            controls->ALUOp = 0;
+            controls->MemWrite = 0;
+            controls->ALUSrc = 1;
+            controls->RegWrite = 0;
+            break;
+        case 0x01:
+            controls->RegDst = 0;
+            controls->Jump = 0;
+            controls->Branch = 1;
+            controls->MemRead = 0;
+            controls->MemtoReg = 0;
+            controls->ALUOp = 6;
+            controls->MemWrite = 0;
+            controls->ALUSrc = 1;
+            controls->RegWrite = 0;
+            break;
+        case 0x02:
+            controls->RegDst = 2;
+            controls->Jump = 1;
+            controls->Branch = 2;
+            controls->MemRead = 2;
+            controls->MemtoReg = 2;
+            controls->ALUOp = 0;
+            controls->MemWrite = 0;
+            controls->ALUSrc = 2;
+            controls->RegWrite = 0;
+            break;
         default:
-            // Handle unrecognized opcode
-            break;
+            return 1;
     }
-
-    return 0;
+    return return 1;
 }
 
 /* Read Register */
@@ -177,14 +219,37 @@ int rw_memory(unsigned ALUresult,unsigned data2,char MemWrite,char MemRead,unsig
 void write_register(unsigned r2,unsigned r3,unsigned memdata,unsigned ALUresult,char RegWrite,char RegDst,char MemtoReg,unsigned *Reg)
 {
     // Instructions: Write the data (ALUresult or memdata) to a register (Reg) addressed by r2 or r3.
+    unsigned write_data;
 
+    // Determine the data to be written to the register
+    if (MemtoReg) {
+        // Write data from memory (memdata)
+        write_data = memdata;
+    } else {
+        // Write data from ALU (ALUresult)
+        write_data = ALUresult;
+    }
+
+    // Determine the destination register address
+    unsigned reg_address;
+    if (RegDst) {
+        // Use r3 as the destination register address
+        reg_address = r3;
+    } else {
+        // Use r2 as the destination register address
+        reg_address = r2;
+    }
+
+    // Write data to register if RegWrite is asserted
+    if (RegWrite) {
+        Reg[reg_address] = write_data;
+    }
 }
 
 /* PC update */
 /* 10 Points */
 void PC_update(unsigned jsec,unsigned extended_value,char Branch,char Jump,char Zero,unsigned *PC)
 {
-    // Assume a simple scenario where you update PC based on Branch, Jump, and Zero conditions.
     if (Branch && Zero) { // Branch if Zero, characters when 1 can be used as bools :)
         *PC += extended_value;
     } else if (Jump) { // Jump to jsec
