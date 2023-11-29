@@ -208,23 +208,17 @@ int ALU_operations(unsigned data1,unsigned data2,unsigned extended_value,unsigne
 /* 10 Points */
 int rw_memory(unsigned ALUresult,unsigned data2,char MemWrite,char MemRead,unsigned *memdata,unsigned *Mem)
 {
-    if (ALUresult % 4 != 0 || ALUresult > 65535)
+    if (ALUresult % 4 != 0 && (MemWrite == 1 || MemRead == 1))
     {
         return 1;
     }
-
-    if (MemWrite == 0 && MemRead == 0)
+    if (MemWrite == 1)
     {
-        // Neither are happening so maybe halt?
-        return 1;
+        Mem[ALUresult >> 2] = data2;
     }
-    else if (MemWrite == 1)
+    if (MemRead == 1)
     {
-        Mem[ALUresult] = data2;
-    }
-    else // Read
-    {
-        *memdata = Mem[ALUresult];
+        *memdata = Mem[ALUresult >> 2];
     }
     
     return 0;
