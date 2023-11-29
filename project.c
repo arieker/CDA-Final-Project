@@ -228,31 +228,30 @@ int rw_memory(unsigned ALUresult,unsigned data2,char MemWrite,char MemRead,unsig
 /* 10 Points */
 void write_register(unsigned r2,unsigned r3,unsigned memdata,unsigned ALUresult,char RegWrite,char RegDst,char MemtoReg,unsigned *Reg)
 {
-    // Instructions: Write the data (ALUresult or memdata) to a register (Reg) addressed by r2 or r3.
-    unsigned write_data;
-
-    // Determine the data to be written to the register
-    if (MemtoReg) {
-        // Write data from memory (memdata)
-        write_data = memdata;
-    } else {
-        // Write data from ALU (ALUresult)
-        write_data = ALUresult;
-    }
-
-    // Determine the destination register address
-    unsigned reg_address;
-    if (RegDst) {
-        // Use r3 as the destination register address
-        reg_address = r3;
-    } else {
-        // Use r2 as the destination register address
-        reg_address = r2;
-    }
-
-    // Write data to register if RegWrite is asserted
-    if (RegWrite) {
-        Reg[reg_address] = write_data;
+   if (RegWrite == 1)
+   {
+        if (MemtoReg == 1)
+        {
+            if (RegDst == 1)
+            {
+                Reg[r3] = memdata;
+            }
+            else
+            {
+                Reg[r2] = memdata;
+            }
+        }
+        else
+        {
+            if (RegDst == 1)
+            {
+                Reg [r3] = ALUresult;
+            }
+            else
+            {
+                Reg [r2] = ALUresult;
+            }
+        }
     }
 }
 
