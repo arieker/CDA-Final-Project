@@ -201,36 +201,40 @@ void sign_extend(unsigned offset,unsigned *extended_value)
 /* 10 Points */
 int ALU_operations(unsigned data1,unsigned data2,unsigned extended_value,unsigned funct,char ALUOp,char ALUSrc,unsigned *ALUresult,char *Zero)
 {
-    if (ALUSrc == 0)
+    if (ALUOp < 0 || ALUOp > 7)
     {
-        switch (funct)
-        {
-        case 0x21:
-            ALUOp = 0;
-            break;
-        case 0x23:
-            ALUOp = 1;
-            break;
-        case 0x24:
-            ALUOp = 4;
-            break;
-        case 0x2a:
-            ALUOp = 2;
-            break;
-        case 0x2b:
-            ALUOp = 3;
-            break;
-        default:
-            return 1;
-        }
+        return 1;
+    }
 
-        ALU(data1, data2, ALUOp, ALUresult, Zero);
+    unsigned tmp;
+
+    if (ALUSrc == 1)
+    {
+        tmp = extended_value;
     }
-    else if (ALUSrc == 1) {
-        
-        ALU(data1, extended_value, ALUOp, ALUresult, Zero);
+    else
+    {
+        tmp = extended_value;
     }
-    
+
+    if (ALUOp == 7)
+    {
+        switch(funct)
+        {
+        case 0x20: ALUOp = 0x0; break;
+        case 0x22: ALUOp = 0x1; break;
+        case 0x2a: ALUOp = 0x2; break;
+        case 0x2b: ALUOp = 0x3; break;
+        case 0x24: ALUOp = 0x4; break;
+        case 0x25: ALUOp = 0x5; break;
+        default: return 1;
+        }
+        ALU(data1, tmp, ALUOp, ALUresult, Zero);
+    }
+    else
+    {
+        ALU(data1, tmp, ALUOp, ALUresult, Zero);
+    }
     return 0;
 }
 
