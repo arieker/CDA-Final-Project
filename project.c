@@ -184,6 +184,12 @@ void write_register(unsigned r2,unsigned r3,unsigned memdata,unsigned ALUresult,
 /* 10 Points */
 void PC_update(unsigned jsec,unsigned extended_value,char Branch,char Jump,char Zero,unsigned *PC)
 {
-    // Instructions: Update the program counter (PC).
-
+    // Assume a simple scenario where you update PC based on Branch, Jump, and Zero conditions.
+    if (Branch && Zero) { // Branch if Zero, characters when 1 can be used as bools :)
+        *PC += extended_value;
+    } else if (Jump) { // Jump to jsec
+        *PC = jsec;
+    } else {
+        *PC += 4;
+    }
 }
