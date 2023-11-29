@@ -12,7 +12,7 @@ void ALU(unsigned A,unsigned B,char ALUControl,unsigned *ALUresult,char *Zero)
         case 0x4: *ALUresult = A & B; break;
         case 0x5: *ALUresult = A | B; break;
         case 0x6: *ALUresult = B << 16; break;
-        case 0x7: *ALUresult = ~A; break;
+        case 0x7: *ALUresult = !A; break;
     }
     
     *Zero = (*ALUresult == 0) ? 1 : 0;
@@ -22,8 +22,7 @@ void ALU(unsigned A,unsigned B,char ALUControl,unsigned *ALUresult,char *Zero)
 /* 10 Points */
 int instruction_fetch(unsigned PC,unsigned *Mem,unsigned *instruction)
 {
-    // Halt condidition for non word-alligned address or over max memory usage
-    if (PC % 4 != 0) // ? this MAY be wrong idk lol
+    if (PC % 4 != 0)
     {
         return 1;
     }
@@ -36,12 +35,12 @@ int instruction_fetch(unsigned PC,unsigned *Mem,unsigned *instruction)
 /* 10 Points */
 void instruction_partition(unsigned instruction, unsigned *op, unsigned *r1,unsigned *r2, unsigned *r3, unsigned *funct, unsigned *offset, unsigned *jsec)
 {
-    *op = (instruction & 0x0000003f) >> 26;      // instruction [31-26]
-    *r1 = (instruction & 0x0000001F) >> 21 ;     // instruction [25-21]
-    *r2 = (instruction & 0x0000001F) >> 16;     // instruction [20-16]
-    *r3 = (instruction & 0x0000001F) >> 11;     // instruction [15-11]
+    *op = (instruction & 0xFC000000) >> 26;      // instruction [31-26]
+    *r1 = (instruction & 0x03F00000) >> 21 ;     // instruction [25-21]
+    *r2 = (instruction & 0x001F0000) >> 16;     // instruction [20-16]
+    *r3 = (instruction & 0x0000F800) >> 11;     // instruction [15-11]
     *funct = instruction & 0x0000003F;           // instruction [5-0]
-    *offset = instruction & 0X0000FFFF;        // instruction [15-0]
+    *offset = instruction & 0x0000FFFF;        // instruction [15-0]
     *jsec = instruction & 0x03FFFFFF;       // instruction [25-0]
 }
 
@@ -60,7 +59,6 @@ int instruction_decode(unsigned op,struct_controls *controls)
     controls -> ALUSrc = 0;
     controls -> RegWrite = 0;
 
-    // Decode the instruction using the opcode (op)
     switch (op) {
         case 0x0:
             controls -> RegDst = 1;
@@ -73,7 +71,7 @@ int instruction_decode(unsigned op,struct_controls *controls)
             controls -> ALUSrc = 0;
             controls -> RegWrite = 1;
             break;
-        // addi, 0000 1000 -> 8.
+        // addi
         case 0x8:
             controls -> RegDst = 0;
             controls -> Jump = 0;
@@ -214,7 +212,7 @@ int ALU_operations(unsigned data1,unsigned data2,unsigned extended_value,unsigne
     }
     else
     {
-        tmp = extended_value;
+        tmp = data2;
     }
 
     if (ALUOp == 7)
@@ -266,24 +264,17 @@ void write_register(unsigned r2,unsigned r3,unsigned memdata,unsigned ALUresult,
    {
         if (MemtoReg == 1)
         {
-            if (RegDst == 1)
-            {
-                Reg[r3] = memdata;
-            }
-            else
-            {
-                Reg[r2] = memdata;
-            }
+            Reg[r2] = memdata;
         }
         else
         {
             if (RegDst == 1)
             {
-                Reg [r3] = ALUresult;
+                Reg[r3] = ALUresult;
             }
             else
             {
-                Reg [r2] = ALUresult;
+                Reg[r2] = ALUresult;
             }
         }
     }
@@ -294,12 +285,12 @@ void write_register(unsigned r2,unsigned r3,unsigned memdata,unsigned ALUresult,
 void PC_update(unsigned jsec,unsigned extended_value,char Branch,char Jump,char Zero,unsigned *PC)
 {
     *PC += 4;
-    if (Jump == 1)
+    if (Zero == 1 && Branch == 1)
     {
-        *PC = (jsec << 2) | (*PC | 0xf0000000);
-    }
-    else if (Branch == 1 && Zero)
+        *PC += extended_value << 2;
+	}
+	if (Jump == 1)
     {
-        *PC += (extended_value << 2);
-    }
+	    *PC = (jsec << 2) | (*PC & 0xf0000000);
+	}
 }
